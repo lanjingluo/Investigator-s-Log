@@ -1,0 +1,76 @@
+﻿[
+  {
+    "Name": "S1_1_Entry",
+    "SpeakerId": "Narrator",
+    "PortraitId": "",
+    "Text": "海雾漫过栈桥，咸腥味里混着煤油与铁锈。",
+    "NextNodeId": "S1_1_Ask",
+    "Choices": [],
+    "GrantClues": [],
+    "SanDelta": 0,
+    "HpDelta": 0,
+    "SetFlag": "",
+    "GrantSkillPoints": 0,
+    "bIsCheckpoint": false,
+    "SceneId": "S1-1"
+  },
+  {
+    "Name": "S1_1_Ask",
+    "SpeakerId": "Player",
+    "PortraitId": "",
+    "Text": "（这座码头安静得不正常。）",
+    "NextNodeId": "S1_1_Choice",
+    "Choices": [],
+    "GrantClues": [],
+    "SanDelta": 0,
+    "HpDelta": 0,
+    "SetFlag": "",
+    "GrantSkillPoints": 0,
+    "bIsCheckpoint": false,
+    "SceneId": "S1-1"
+  },
+  {
+    "Name": "S1_1_Choice",
+    "SpeakerId": "Player",
+    "PortraitId": "",
+    "Text": "你要从哪儿问起？",
+    "NextNodeId": "",
+    "Choices": [
+      {
+        "ChoiceId": "AskTicket",
+        "Text": "检查售票亭的船票",
+        "bRequiresCheck": true,
+        "Skill": "Investigation",
+        "Difficulty": "Hard",
+        "SuccessNodeId": "S1_1_TicketOK",
+        "FailureNodeId": "S1_1_TicketNo",
+        "RequiredClueId": "",
+        "RequiredFlag": "",
+        "StepCostType": "Search",
+        "bConsumeStep": true,
+        "bOnceOnly": true
+      },
+      {
+        "ChoiceId": "AskWorker",
+        "Text": "向码头工打听",
+        "bRequiresCheck": true,
+        "Skill": "Persuasion",
+        "Difficulty": "Regular",
+        "SuccessNodeId": "S1_1_WorkerOK",
+        "FailureNodeId": "S1_1_WorkerNo",
+        "RequiredClueId": "",
+        "RequiredFlag": "",
+        "StepCostType": "Ask",
+        "bConsumeStep": true,
+        "bOnceOnly": true
+      }
+    ],
+    "GrantClues": [],
+    "SanDelta": 0,
+    "HpDelta": 0,
+    "SetFlag": "",
+    "GrantSkillPoints": 0,
+    "bIsCheckpoint": false,
+    "SceneId": "S1-1"
+  }
+]

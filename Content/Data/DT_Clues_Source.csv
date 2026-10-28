@@ -1,0 +1,3 @@
+﻿Name,DisplayName,Description,bIsKeyClue,SceneId,SourceNodeId,EndingWeight,EvidenceImageId
+CL-01,失踪者名单,"港警局流出的名单，七个名字旁标着失踪日期。",true,S1-1,S1_1_TicketOK,3,CL-01
+CL-02,海雾酒馆账本,"酒馆老账本里夹着几笔奇怪的酒水赊账。",false,S1-2,,1,CL-02
