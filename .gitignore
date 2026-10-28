@@ -1,0 +1,14 @@
+# UE5 生成目录与 IDE 缓存不入库
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+
+# VS 解决方案文件（由 .uproject 重新生成）
+*.sln
+*.slnx
+*.suo
+*.VC.db
+*.opensdf
+*.sdf
