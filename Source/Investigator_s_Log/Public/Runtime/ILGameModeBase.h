@@ -1,0 +1,59 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/GameModeBase.h"
+#include "ILGameModeBase.generated.h"
+
+class UDataTable;
+class UILDialogueRunner;
+class UILGameSessionSubsystem;
+
+/**
+ * 关卡级 GameMode：进入场景时按场景表初始化步数段，并装配本关对话运行器。
+ * 周目数据仍存于 GameInstance，本类只做「每关装配」。
+ */
+UCLASS()
+class AILGameModeBase : public AGameModeBase
+{
+	GENERATED_BODY()
+
+public:
+	AILGameModeBase();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	/** 当前场景 ID（关卡蓝图或 GameInstance 设置）。 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Scene")
+	FName SceneId;
+
+	/** 场景表资产（行结构 FILSceneRow）。 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Scene")
+	TObjectPtr<UDataTable> SceneTable;
+
+	/** 对话表资产（行结构 FILDialogueNode）。 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dialogue")
+	TObjectPtr<UDataTable> DialogueTable;
+
+	/** 线索表资产（行结构 FILClueRow，供运行器扩展校验）。 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dialogue")
+	TObjectPtr<UDataTable> ClueTable;
+
+	/** 开始一段对话（转发给对话运行器）。 */
+	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+	void StartDialogue(FName StartNodeId);
+
+	/** 结束周目进入结算。 */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void FinishRun(FName EndingId);
+
+protected:
+	/** 会话子系统缓存（BeginPlay 时获取）。 */
+	UPROPERTY()
+	TObjectPtr<UILGameSessionSubsystem> Session;
+
+	/** 本关对话运行器（每关新建，状态不跨关携带）。 */
+	UPROPERTY()
+	TObjectPtr<UILDialogueRunner> DialogueRunner;
+};
