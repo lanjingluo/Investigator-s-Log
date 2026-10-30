@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/ILTypes.h"
 #include "ILAttributes.generated.h"
 
 /**
@@ -46,11 +47,9 @@ struct FILAttributes
 	int32 LUK = 10;
 
 	/** 最大生命值 = (STR + CON) / 2 + 2，整数除法向下取整；归零昏迷而非死亡。 */
-	UFUNCTION(BlueprintPure, Category = "Attributes")
 	int32 GetMaxHP() const;
 
 	/** 最大理智值 = POW × 3；归零癫狂。 */
-	UFUNCTION(BlueprintPure, Category = "Attributes")
 	int32 GetMaxSAN() const;
 
 	/**
@@ -63,7 +62,6 @@ struct FILAttributes
 	 * @param MaxValue  上界
 	 * @return 步数池大小
 	 */
-	UFUNCTION(BlueprintPure, Category = "Attributes")
 	int32 GetStepBudget(int32 Base = 15, float Divisor = 1.5f, int32 MinValue = 8, int32 MaxValue = 25) const;
 };
 
@@ -87,7 +85,6 @@ struct FILSkillSet
 	 * @param DefaultValue  未配置时的回退值
 	 * @return 技能值
 	 */
-	UFUNCTION(BlueprintPure, Category = "Skills")
 	int32 GetSkill(EILSkill Skill, int32 DefaultValue = 5) const;
 
 	/**
@@ -96,6 +93,5 @@ struct FILSkillSet
 	 * @param Delta    增量，可为负
 	 * @param MaxValue 技能值上限
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Skills")
 	void AddSkillPoints(EILSkill Skill, int32 Delta, int32 MaxValue = 100);
 };

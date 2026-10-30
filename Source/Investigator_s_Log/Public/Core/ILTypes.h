@@ -103,7 +103,6 @@ struct FILDiceRoll
 	EILRollResult Result = EILRollResult::Failure;
 
 	/** 判定是否成功（大成功与普通成功均为 true）。 */
-	UFUNCTION(BlueprintPure, Category = "Check")
 	bool IsSuccess() const
 	{
 		return Result == EILRollResult::Success || Result == EILRollResult::CriticalSuccess;

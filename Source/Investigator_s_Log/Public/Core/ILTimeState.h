@@ -39,14 +39,12 @@ struct FILTimeState
 	 * 剩余步数。
 	 * @return 限步段返回 StepBudget - StepsSpent；自由段返回 -1 表示无限
 	 */
-	UFUNCTION(BlueprintPure, Category = "Time")
 	int32 GetRemainingSteps() const;
 
 	/**
 	 * 进入新场景时重置步数段。
 	 * @param InBudget 步数池；<= 0 视为自由探索段
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Time")
 	void BeginScene(int32 InBudget);
 
 	/**
@@ -54,17 +52,14 @@ struct FILTimeState
 	 * @param Cost 本次消耗步数，默认 1（移动/搜查/问询各消耗 1 步）
 	 * @return 步数充足返回 true；不足返回 false，调用方应阻止该交互
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Time")
 	bool TrySpendStep(int32 Cost = 1);
 
 	/**
 	 * 记录一次昏迷（HP 归零时由上层调用）。只累加计数与浪费时间，不触发任何提示。
 	 * @param WastedHoursPerFaint 每次昏迷浪费的小时数（由 UILGameSettings 注入）
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Time")
 	void ApplyFaint(int32 WastedHoursPerFaint = 2);
 
 	/** 终章事件难度加成 = 昏迷次数（策划公式：难度 = 基础 + 昏迷次数）。 */
-	UFUNCTION(BlueprintPure, Category = "Time")
 	int32 GetFinaleDifficultyBonus() const { return FaintCount; }
 };

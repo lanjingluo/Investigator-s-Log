@@ -54,13 +54,11 @@ struct FILPartyMemberState
 	 * 队友 HP 归零不进入昏迷流程（与主角不同），由上层按剧情标记 bIsGone。
 	 * @param Delta 变化量，可为负
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Party")
 	void ApplyHP(int32 Delta);
 
 	/**
 	 * 施加 SAN 变化，结果 clamp 到 [0, MaxSAN]；归零时置 bIsBroken = true（幂等）。
 	 * @param Delta 变化量，可为负
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Party")
 	void ApplySAN(int32 Delta);
 };

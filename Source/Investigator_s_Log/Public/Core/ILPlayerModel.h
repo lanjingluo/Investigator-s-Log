@@ -65,21 +65,18 @@ struct FILPlayerModel
 	FName CurrentSceneId;
 
 	/** 新周目初始化：按属性计算 HP/SAN 上限并回满。 */
-	UFUNCTION(BlueprintCallable, Category = "Model")
 	void InitializeFromAttributes();
 
 	/**
 	 * 施加 HP 变化，clamp 到 [0, GetMaxHP()]；归零的昏迷副作用由上层处理。
 	 * @param Delta 变化量，可为负
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Model")
 	void ApplyHP(int32 Delta);
 
 	/**
 	 * 施加 SAN 变化，clamp 到 [0, GetMaxSAN()]。
 	 * @param Delta 变化量，可为负
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Model")
 	void ApplySAN(int32 Delta);
 
 	/**

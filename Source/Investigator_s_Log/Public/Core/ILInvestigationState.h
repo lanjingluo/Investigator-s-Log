@@ -18,15 +18,12 @@ struct FILInvestigationState
 	TMap<FName, bool> ClueCollected;
 
 	/** 获得线索；重复获得保持幂等（值保持 true）。 */
-	UFUNCTION(BlueprintCallable, Category = "Clues")
 	void AddClue(FName ClueId);
 
 	/** 是否已获得指定线索。 */
-	UFUNCTION(BlueprintPure, Category = "Clues")
 	bool HasClue(FName ClueId) const;
 
 	/** 已获得线索数量。 */
-	UFUNCTION(BlueprintPure, Category = "Clues")
 	int32 GetCollectedCount() const;
 
 	/**
@@ -35,6 +32,5 @@ struct FILInvestigationState
 	 * @param TotalClueCount 本周目线索总数（由线索表统计）；<= 0 时返回 0，避免除零
 	 * @return 完整度比例，clamp 到 [0, 1]
 	 */
-	UFUNCTION(BlueprintPure, Category = "Clues")
 	float GetCompletionRate(int32 TotalClueCount) const;
 };
