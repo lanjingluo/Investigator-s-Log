@@ -44,8 +44,11 @@ void AILTopDownPawn::Tick(float DeltaSeconds)
 
 void AILTopDownPawn::Move(FVector2D Axis)
 {
-	AddMovementInput(FVector::RightVector, Axis.X);
-	AddMovementInput(FVector::ForwardVector, Axis.Y);
+	// 以 Pawn 自身偏航为基准取前/右方向（投影到水平面）：W 恒为屏幕上方，
+	// 不受 Player Start 出生朝向影响（相机固定挂载于 Pawn，屏幕上方=自身前向的水平投影）
+	const FRotator YawOnlyRotation(0.f, GetActorRotation().Yaw, 0.f);
+	AddMovementInput(YawOnlyRotation.RotateVector(FVector::ForwardVector), Axis.Y);
+	AddMovementInput(YawOnlyRotation.RotateVector(FVector::RightVector), Axis.X);
 }
 
 bool AILTopDownPawn::MoveToScreenPosition(const FVector2D& ScreenPosition)

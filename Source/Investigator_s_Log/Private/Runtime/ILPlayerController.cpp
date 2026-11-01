@@ -2,6 +2,8 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "EnhancedPlayerInput.h"
+#include "InputMappingContext.h"
 #include "Runtime/ILInteractionComponent.h"
 
 AILPlayerController::AILPlayerController()
@@ -16,6 +18,13 @@ void AILPlayerController::BeginPlay()
 
 	// 俯视角点选交互依赖常显鼠标，并默认进入探索上下文
 	SetShowMouseCursor(true);
+
+	// UE5.8 兼容修复：引擎可能把 PlayerInput 创建为旧版 UPlayerInput（不路由 Enhanced 按键），
+	// 强制替换为 EnhancedPlayerInput，否则 WASD/E 全部静默失效
+	if (PlayerInput == nullptr || !PlayerInput->IsA<UEnhancedPlayerInput>())
+	{
+		PlayerInput = NewObject<UEnhancedPlayerInput>(this);
+	}
 	SwitchInputContext(FName(TEXT("Exploration")));
 }
 
