@@ -124,6 +124,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Session")
 	void FinishRun(FName EndingId);
 
+	/**
+	 * 取当前周目信息完整度（0-1）。
+	 * @return 已收集线索数 / 当前场景线索总数；线索总数为 0 时返回 0
+	 */
+	float GetCompletionRate() const
+	{
+		return GetModel().Investigation.GetCompletionRate(CurrentTotalClueCount);
+	}
+
 	// ---- 广播（表现层只订阅）----
 
 	/** HP/SAN/剩余步数变化。 */

@@ -1,10 +1,19 @@
 #include "Runtime/ILPlayerController.h"
 
+#include "Data/ILDataTypes.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedPlayerInput.h"
 #include "InputMappingContext.h"
+#include "Runtime/ILGameInstance.h"
+#include "Runtime/ILGameModeBase.h"
 #include "Runtime/ILInteractionComponent.h"
+#include "Subsystems/ILDialogueRunner.h"
+#include "Subsystems/ILGameSessionSubsystem.h"
+#include "UI/ILDialogueWidget.h"
+#include "UI/ILDiceRollWidget.h"
+#include "UI/ILHUDWidget.h"
+#include "UI/ILResultWidget.h"
 
 AILPlayerController::AILPlayerController()
 {
@@ -26,6 +35,8 @@ void AILPlayerController::BeginPlay()
 		PlayerInput = NewObject<UEnhancedPlayerInput>(this);
 	}
 	SwitchInputContext(FName(TEXT("Exploration")));
+
+	InitSessionUI();
 }
 
 void AILPlayerController::SetupInputComponent()
@@ -108,4 +119,130 @@ void AILPlayerController::SetUIInputMode(bool bUIOnly)
 		SetInputMode(Mode);
 	}
 	SetShowMouseCursor(true);
+}
+
+void AILPlayerController::InitSessionUI()
+{
+	UILGameInstance* InvestigatorGI = Cast<UILGameInstance>(GetGameInstance());
+	UILGameSessionSubsystem* Session = InvestigatorGI ? InvestigatorGI->GetSession() : nullptr;
+	if (Session == nullptr || bSessionDelegatesBound)
+	{
+		return;
+	}
+
+	// 会话委托是 UI 的唯一驱动源：PC 只做中转，把事件翻译成各界面的显隐与刷新
+	Session->OnDialogueNodeChanged.AddDynamic(this, &AILPlayerController::HandleDialogueNodeChanged);
+	Session->OnDiceRollRequested.AddDynamic(this, &AILPlayerController::HandleDiceRollRequested);
+	Session->OnRunFinished.AddDynamic(this, &AILPlayerController::HandleRunFinished);
+	bSessionDelegatesBound = true;
+
+	// 常驻 HUD 立即上屏；对话与骰子面板创建后先收起，由事件驱动显示
+	if (HUDWidgetClass)
+	{
+		HUDWidget = CreateWidget<UILHUDWidget>(this, HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
+	if (DialogueWidgetClass)
+	{
+		DialogueWidget = CreateWidget<UILDialogueWidget>(this, DialogueWidgetClass);
+		if (DialogueWidget)
+		{
+			DialogueWidget->AddToViewport();
+			DialogueWidget->HideDialogue();
+		}
+	}
+	if (DiceRollWidgetClass)
+	{
+		DiceRollWidget = CreateWidget<UILDiceRollWidget>(this, DiceRollWidgetClass);
+		if (DiceRollWidget)
+		{
+			DiceRollWidget->AddToViewport();
+			DiceRollWidget->HidePanel();
+		}
+	}
+
+	// [IL诊断] 对话链路第3站：四个 UI 槽位是否在蓝图里配置
+	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] UI槽位：HUD=%s，Dialogue=%s，DiceRoll=%s，Result=%s"),
+		HUDWidgetClass ? TEXT("已配") : TEXT("【空】"),
+		DialogueWidgetClass ? TEXT("已配") : TEXT("【空！对话界面不会创建】"),
+		DiceRollWidgetClass ? TEXT("已配") : TEXT("【空】"),
+		ResultWidgetClass ? TEXT("已配") : TEXT("【空】"));
+}
+
+void AILPlayerController::HandleDialogueNodeChanged(FName NodeId)
+{
+	// [IL诊断] 对话链路第4站：委托是否到达 PC
+	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] OnDialogueNodeChanged到达PC：NodeId=%s，DialogueWidget=%s"),
+		*NodeId.ToString(),
+		DialogueWidget ? TEXT("已创建") : TEXT("【空！槽位未配或创建失败】"));
+	if (DialogueWidget == nullptr)
+	{
+		return;
+	}
+
+	// 运行器每关由 GameMode 重建，动态获取而非缓存，避免跨关悬挂
+	const AILGameModeBase* GameMode = GetWorld() ? Cast<AILGameModeBase>(GetWorld()->GetAuthGameMode()) : nullptr;
+	UILDialogueRunner* Runner = GameMode ? GameMode->GetDialogueRunner() : nullptr;
+
+	// NodeId 为 None（对话收尾）或运行器缺失：收起界面并回到探索态输入
+	if (NodeId.IsNone() || Runner == nullptr)
+	{
+		DialogueWidget->HideDialogue();
+		SwitchInputContext(FName(TEXT("Exploration")));
+		SetUIInputMode(false);
+		return;
+	}
+
+	FILDialogueNode Node;
+	if (!Runner->GetCurrentNode(Node))
+	{
+		return;
+	}
+
+	DialogueWidget->ShowNode(Node, Runner);
+	SwitchInputContext(FName(TEXT("Dialogue")));
+	SetUIInputMode(true);
+}
+
+void AILPlayerController::HandleDiceRollRequested(const FILDiceRoll& Roll)
+{
+	if (DiceRollWidget == nullptr)
+	{
+		return;
+	}
+
+	// 检定必然由运行器发起，此处取运行器只为把「应用结果」的回调通道传给面板
+	const AILGameModeBase* GameMode = GetWorld() ? Cast<AILGameModeBase>(GetWorld()->GetAuthGameMode()) : nullptr;
+	UILDialogueRunner* Runner = GameMode ? GameMode->GetDialogueRunner() : nullptr;
+	if (Runner == nullptr)
+	{
+		return;
+	}
+
+	DiceRollWidget->PlayRoll(Roll, Runner);
+	if (DialogueWidget)
+	{
+		DialogueWidget->SetRollPending(true);
+	}
+}
+
+void AILPlayerController::HandleRunFinished(FName EndingId)
+{
+	// 结算界面懒创建：正常流程一周目只出现一次
+	if (ResultWidget == nullptr && ResultWidgetClass)
+	{
+		ResultWidget = CreateWidget<UILResultWidget>(this, ResultWidgetClass);
+		if (ResultWidget)
+		{
+			ResultWidget->AddToViewport(10);
+		}
+	}
+	if (ResultWidget)
+	{
+		ResultWidget->ShowResult(EndingId);
+	}
+	SetUIInputMode(true);
 }

@@ -48,6 +48,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Run")
 	void FinishRun(FName EndingId);
 
+	/**
+	 * 取本关对话运行器（PC 转发对话 UI 事件用）。
+	 * @return 运行器指针；关卡未配置对话表时为 nullptr
+	 */
+	UILDialogueRunner* GetDialogueRunner() const { return DialogueRunner.Get(); }
+
 protected:
 	/** 会话子系统缓存（BeginPlay 时获取）。 */
 	UPROPERTY()
