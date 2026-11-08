@@ -38,6 +38,13 @@ public:
 	 */
 	void SetRollPending(bool bPending);
 
+	/**
+	 * 线性节点（无选项）点击面板任意处推进到下一句。
+	 * 带选项节点面板不可命中（SelfHitTestInvisible），不会误触发；
+	 * 骰子等待期由运行器 bWaitingForRoll 兜底防重复推进。
+	 */
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 protected:
 	/** 构建选项列表（清空后按当前节点逐条创建条目）。 */
 	void BuildChoiceEntries();

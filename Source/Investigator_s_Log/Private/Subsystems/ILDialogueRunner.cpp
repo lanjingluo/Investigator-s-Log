@@ -19,10 +19,6 @@ void UILDialogueRunner::Initialize(UDataTable* InDialogueTable, UDataTable* InCl
 
 void UILDialogueRunner::StartAt(FName NodeId)
 {
-	// [IL诊断] 对话链路第2站：运行器收到起始节点
-	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] StartAt：NodeId=%s，DialogueTable=%s"),
-		*NodeId.ToString(),
-		DialogueTable ? *DialogueTable->GetName() : TEXT("【空！】"));
 	EnterNode(NodeId);
 }
 
@@ -190,8 +186,6 @@ void UILDialogueRunner::EnterNode(FName NodeId)
 		: nullptr;
 	if (Node == nullptr)
 	{
-		// [IL诊断] 表中找不到该行：NodeId 与 DataTable 行名不匹配（或对话正常结束 None）
-		UE_LOG(LogTemp, Warning, TEXT("[IL诊断] EnterNode：表中未找到行【%s】（行名不匹配或对话结束）"), *NodeId.ToString());
 		// 空节点 = 对话结束或数据缺失：仅广播让 UI 收起对话，不视为错误
 		Session->OnDialogueNodeChanged.Broadcast(NodeId);
 		return;

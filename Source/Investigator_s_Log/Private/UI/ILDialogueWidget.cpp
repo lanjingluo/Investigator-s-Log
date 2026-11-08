@@ -1,5 +1,6 @@
 #include "UI/ILDialogueWidget.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -13,7 +14,7 @@ void UILDialogueWidget::ShowNode(const FILDialogueNode& Node, UILDialogueRunner*
 	RunnerPtr = Runner;
 	CurrentNode = Node;
 
-	SetVisibility(ESlateVisibility::HitTestInvisible);
+	SetVisibility(Node.Choices.Num() > 0 ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Visible);
 
 	// 说话人与正文直接来自表行；说话人 ID 先以原文显示，本地化映射表接入后替换
 	if (SpeakerNameText)
@@ -91,4 +92,14 @@ void UILDialogueWidget::HandleChoiceClicked(int32 ChoiceIndex)
 	{
 		Runner->SelectChoice(ChoiceIndex);
 	}
+}
+
+FReply UILDialogueWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// 线性节点点击推进：Advance 对带选项节点与骰子等待期内部直接忽略
+	if (UILDialogueRunner* Runner = RunnerPtr.Get())
+	{
+		Runner->Advance();
+	}
+	return FReply::Handled();
 }

@@ -41,11 +41,6 @@ void AILGameModeBase::BeginPlay()
 
 void AILGameModeBase::StartDialogue(FName StartNodeId)
 {
-	// [IL诊断] 对话链路第1站：确认蓝图调用了本函数且表已挂载
-	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] StartDialogue被调用：NodeId=%s，DialogueTable=%s，Runner=%s"),
-		*StartNodeId.ToString(),
-		DialogueTable ? *DialogueTable->GetName() : TEXT("【空！GameMode未挂对话表】"),
-		DialogueRunner ? TEXT("有效") : TEXT("【空！BeginPlay未创建】"));
 	if (DialogueRunner != nullptr)
 	{
 		DialogueRunner->StartAt(StartNodeId);

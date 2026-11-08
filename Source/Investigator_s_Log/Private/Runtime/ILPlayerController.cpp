@@ -1,5 +1,6 @@
 #include "Runtime/ILPlayerController.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Data/ILDataTypes.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -163,21 +164,10 @@ void AILPlayerController::InitSessionUI()
 			DiceRollWidget->HidePanel();
 		}
 	}
-
-	// [IL诊断] 对话链路第3站：四个 UI 槽位是否在蓝图里配置
-	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] UI槽位：HUD=%s，Dialogue=%s，DiceRoll=%s，Result=%s"),
-		HUDWidgetClass ? TEXT("已配") : TEXT("【空】"),
-		DialogueWidgetClass ? TEXT("已配") : TEXT("【空！对话界面不会创建】"),
-		DiceRollWidgetClass ? TEXT("已配") : TEXT("【空】"),
-		ResultWidgetClass ? TEXT("已配") : TEXT("【空】"));
 }
 
 void AILPlayerController::HandleDialogueNodeChanged(FName NodeId)
 {
-	// [IL诊断] 对话链路第4站：委托是否到达 PC
-	UE_LOG(LogTemp, Warning, TEXT("[IL诊断] OnDialogueNodeChanged到达PC：NodeId=%s，DialogueWidget=%s"),
-		*NodeId.ToString(),
-		DialogueWidget ? TEXT("已创建") : TEXT("【空！槽位未配或创建失败】"));
 	if (DialogueWidget == nullptr)
 	{
 		return;
