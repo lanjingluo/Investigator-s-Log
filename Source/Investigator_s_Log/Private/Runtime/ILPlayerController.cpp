@@ -165,6 +165,7 @@ void AILPlayerController::InitSessionUI()
 	Session->OnDialogueNodeChanged.AddDynamic(this, &AILPlayerController::HandleDialogueNodeChanged);
 	Session->OnDiceRollRequested.AddDynamic(this, &AILPlayerController::HandleDiceRollRequested);
 	Session->OnRunFinished.AddDynamic(this, &AILPlayerController::HandleRunFinished);
+	Session->OnDiceRollResolved.AddDynamic(this, &AILPlayerController::HandleDiceRollResolved);
 	bSessionDelegatesBound = true;
 
 	// 常驻 HUD 立即上屏；对话与骰子面板创建后先收起，由事件驱动显示
@@ -265,4 +266,13 @@ void AILPlayerController::HandleRunFinished(FName EndingId)
 		ResultWidget->ShowResult(EndingId);
 	}
 	SetUIInputMode(true);
+}
+
+void AILPlayerController::HandleDiceRollResolved()
+{
+	// 解锁选项列表：与 HandleDiceRollRequested 里的 SetRollPending(true) 成对
+	if (DialogueWidget)
+	{
+		DialogueWidget->SetRollPending(false);
+	}
 }

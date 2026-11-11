@@ -59,6 +59,8 @@ void UILDialogueWidget::BuildChoiceEntries()
 	{
 		return;
 	}
+	// 兜底：无论上一状态如何，重建选项时恢复可点击（防止任何路径遗漏解锁）
+	ChoiceList->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	ChoiceList->ClearChildren();
 
 	UILDialogueRunner* Runner = RunnerPtr.Get();

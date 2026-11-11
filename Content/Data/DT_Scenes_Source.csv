@@ -1,3 +1,3 @@
 ﻿Name,DisplayName,ChapterId,bLimitedSteps,StepBudgetOverride,EntryDialogueNodeId,LevelAsset,TotalClueCount
-S1-1,灰港码头,Chapter1,true,15,S1_1_Entry,,1
-S1-2,海雾酒馆,Chapter1,false,0,,,1
+S1-1,灰港码头,Chapter1,true,15,S1_1_Entry,,2
+S1-2,海雾酒馆,Chapter1,false,0,S1_2_Entry,,2

@@ -71,6 +71,10 @@ protected:
 	/** 周目结束：显示结算界面（唯一点破隐藏机制处）。 */
 	UFUNCTION()
 	void HandleRunFinished(FName EndingId);
+
+	/** 骰子动画结束：解锁对话选项列表（与 SetRollPending(true) 成对）。 */
+	UFUNCTION()
+	void HandleDiceRollResolved();
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
