@@ -36,6 +36,13 @@ void AILGameModeBase::BeginPlay()
 	{
 		DialogueRunner = NewObject<UILDialogueRunner>(this);
 		DialogueRunner->Initialize(DialogueTable, ClueTable, Session);
+
+		// 读档恢复：把一次性选项与检定种子注入本关新运行器（一次性消费）
+		if (ILGameInst != nullptr && ILGameInst->HasPendingRunnerState())
+		{
+			DialogueRunner->RestoreState(ILGameInst->GetPendingUsedChoiceIds(), ILGameInst->GetPendingRollSeed());
+			ILGameInst->ClearPendingRunnerState();
+		}
 	}
 }
 
@@ -45,6 +52,24 @@ void AILGameModeBase::StartDialogue(FName StartNodeId)
 	{
 		DialogueRunner->StartAt(StartNodeId);
 	}
+}
+
+bool AILGameModeBase::ResumeFromCheckpoint()
+{
+	// 读档后从 GameInstance 检查点恢复；对话未经过任何检查点时静默提示
+	UILGameInstance* ILGameInst = Cast<UILGameInstance>(GetGameInstance());
+	const FName CheckpointId = ILGameInst ? ILGameInst->CurrentCheckpointNodeId : NAME_None;
+	if (CheckpointId.IsNone())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[IL] ResumeFromCheckpoint：无检查点（对话尚未经过 bIsCheckpoint 节点），忽略"));
+		return false;
+	}
+	if (DialogueRunner == nullptr)
+	{
+		return false;
+	}
+	DialogueRunner->StartAt(CheckpointId);
+	return true;
 }
 
 void AILGameModeBase::FinishRun(FName EndingId)

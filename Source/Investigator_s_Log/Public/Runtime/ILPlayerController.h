@@ -77,6 +77,14 @@ protected:
 	/** 交互键触发（转发给交互检测组件）。 */
 	void OnInteractPressed();
 
+	/** 调试：F5 保存周目（存档槽 ILSaveSlot），屏幕消息反馈结果。 */
+	UFUNCTION()
+	void DebugSaveRun();
+
+	/** 调试：F9 读取周目并刷新 HUD，屏幕消息反馈结果。 */
+	UFUNCTION()
+	void DebugLoadRun();
+
 	/** 探索态输入映射上下文。 */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> ExplorationContext;

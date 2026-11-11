@@ -159,10 +159,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Session")
 	FILOnDiceRollResolved OnDiceRollResolved;
 
-private:
-	/** 统一的状态变更广播，避免每个修改入口各写一遍。 */
+public:
+	/** 统一的状态变更广播，避免每个修改入口各写一遍；读档后 GameInstance 也用它刷新 HUD。 */
 	void BroadcastStats();
 
+private:
 	/** 取可写玩家模型（内部修改专用；GameInstance 类型异常时为静态空模型）。 */
 	FILPlayerModel& GetModelMutable();
 

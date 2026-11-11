@@ -3,6 +3,7 @@
 #include "Core/ILCheckSystem.h"
 #include "Data/ILGameSettings.h"
 #include "Engine/DataTable.h"
+#include "Runtime/ILGameInstance.h"
 #include "Subsystems/ILGameSessionSubsystem.h"
 
 void UILDialogueRunner::Initialize(UDataTable* InDialogueTable, UDataTable* InClueTable, UILGameSessionSubsystem* InSession)
@@ -13,8 +14,15 @@ void UILDialogueRunner::Initialize(UDataTable* InDialogueTable, UDataTable* InCl
 	CurrentNodeId = NAME_None;
 	bWaitingForRoll = false;
 	UsedChoiceIds.Reset();
-	// 独立随机化种子；后续接存档时改为从存档恢复以保证检定可复现
+	// 独立随机化种子；RestoreState 注入存档种子后检定序列可复现
 	RollStream.Initialize(FMath::Rand());
+}
+
+void UILDialogueRunner::RestoreState(const TSet<FName>& InUsedChoiceIds, int32 InSeed)
+{
+	// 读档恢复：一次性选项与检定种子来自存档快照（GameMode 装配本关运行器后调用）
+	UsedChoiceIds = InUsedChoiceIds;
+	RollStream.Initialize(InSeed);
 }
 
 void UILDialogueRunner::StartAt(FName NodeId)
@@ -211,6 +219,18 @@ void UILDialogueRunner::EnterNode(FName NodeId)
 	if (Node->GrantSkillPoints != 0)
 	{
 		Session->AddSkillPoints(Node->GrantSkillPoints);
+	}
+
+	// 检查点节点：记录到 GameInstance，读档后可从此恢复对话
+	if (Node->bIsCheckpoint)
+	{
+		if (UGameInstance* GameInst = Session->GetGameInstance())
+		{
+			if (UILGameInstance* ILGameInst = Cast<UILGameInstance>(GameInst))
+			{
+				ILGameInst->CurrentCheckpointNodeId = NodeId;
+			}
+		}
 	}
 
 	Session->OnDialogueNodeChanged.Broadcast(NodeId);

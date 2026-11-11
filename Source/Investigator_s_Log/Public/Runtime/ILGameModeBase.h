@@ -44,6 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 	void StartDialogue(FName StartNodeId);
 
+	/**
+	 * 从最近检查点恢复对话（读档后调用）；无检查点时不做任何事并输出日志。
+	 * @return 是否成功从检查点开始
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+	bool ResumeFromCheckpoint();
+
 	/** 结束周目进入结算。 */
 	UFUNCTION(BlueprintCallable, Category = "Run")
 	void FinishRun(FName EndingId);

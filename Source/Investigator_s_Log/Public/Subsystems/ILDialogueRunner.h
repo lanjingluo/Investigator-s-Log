@@ -79,6 +79,19 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Dialogue")
 	float GetChoiceSuccessChance(const FILDialogueChoice& Choice) const;
 
+	/**
+	 * 从存档恢复运行器状态（GameMode 装配 Runner 后、对话开始前调用）。
+	 * @param InUsedChoiceIds 已使用的一次性选项集合
+	 * @param InSeed 检定随机流种子
+	 */
+	void RestoreState(const TSet<FName>& InUsedChoiceIds, int32 InSeed);
+
+	/** 检定随机流当前种子（存档时取走用于复现）。 */
+	int32 GetRollSeed() const { return RollStream.GetCurrentSeed(); }
+
+	/** 已使用的一次性选项集合只读视图（存档时取走）。 */
+	const TSet<FName>& GetUsedChoiceIds() const { return UsedChoiceIds; }
+
 private:
 	/**
 	 * 进入节点：应用副作用（必得线索/SAN/HP/标记/技能点/检查点）后广播节点变更；

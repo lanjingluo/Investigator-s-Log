@@ -2,9 +2,11 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Data/ILDataTypes.h"
+#include "Engine/Engine.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedPlayerInput.h"
+#include "InputCoreTypes.h"
 #include "InputMappingContext.h"
 #include "Runtime/ILGameInstance.h"
 #include "Runtime/ILGameModeBase.h"
@@ -52,6 +54,10 @@ void AILPlayerController::SetupInputComponent()
 			EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &AILPlayerController::OnInteractPressed);
 		}
 	}
+
+	// 调试键：F5 存档 / F9 读档（旧版 BindKey 与 EnhancedInput 共存，无需 IMC 映射）
+	InputComponent->BindKey(EKeys::F5, IE_Pressed, this, &AILPlayerController::DebugSaveRun);
+	InputComponent->BindKey(EKeys::F9, IE_Pressed, this, &AILPlayerController::DebugLoadRun);
 }
 
 void AILPlayerController::OnInteractPressed()
@@ -59,6 +65,28 @@ void AILPlayerController::OnInteractPressed()
 	if (InteractionComponent != nullptr)
 	{
 		InteractionComponent->TriggerInteract();
+	}
+}
+
+void AILPlayerController::DebugSaveRun()
+{
+	// 调试存档：结果直接打到屏幕，省去翻日志
+	if (UILGameInstance* GameInst = Cast<UILGameInstance>(GetGameInstance()))
+	{
+		const bool bSaved = GameInst->SaveRun();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, bSaved ? FColor::Green : FColor::Red,
+			bSaved ? TEXT("[IL] F5 已保存周目") : TEXT("[IL] F5 保存失败（无 GameInstance 或写盘失败）"));
+	}
+}
+
+void AILPlayerController::DebugLoadRun()
+{
+	// 调试读档：LoadRun 内部已恢复模型并广播刷新 HUD
+	if (UILGameInstance* GameInst = Cast<UILGameInstance>(GetGameInstance()))
+	{
+		const bool bLoaded = GameInst->LoadRun();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, bLoaded ? FColor::Green : FColor::Red,
+			bLoaded ? TEXT("[IL] F9 已读取周目，HUD 应已刷新") : TEXT("[IL] F9 无存档或版本不符"));
 	}
 }
 
@@ -108,8 +136,10 @@ void AILPlayerController::SetUIInputMode(bool bUIOnly)
 {
 	if (bUIOnly)
 	{
-		// 仅 UI：弹窗/对话期间暂停游戏侧输入
-		FInputModeUIOnly Mode;
+		// 对话/结算态：改用 GameAndUI——Enhanced IMC 已切走（WASD 无效），
+		// 但保留游戏侧旧版键绑定（F5/F9 存读档调试键在 UIOnly 下会被吞掉）
+		FInputModeGameAndUI Mode;
+		Mode.SetHideCursorDuringCapture(false);
 		SetInputMode(Mode);
 	}
 	else
